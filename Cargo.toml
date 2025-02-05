@@ -5,3 +5,18 @@ authors = ["Artem Sergeev <...>"]
 edition = "2021"
 
 [dependencies]
+log = "0.4.25"
+tonic = "0.12.3"
+prost = "0.13.4"
+config = "0.15.7"
+anyhow = "1.0.95"
+serde_json = "1"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }
+
+[build-dependencies]
+tonic-build = { version = "0.12", features = [] }
+
+[[bin]]
+name = "simple_grpc_server"
+path = "src/main.rs"
