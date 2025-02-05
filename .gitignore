@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# IntelliJ
+.idea
+
+# Rust
+/target
+Cargo.lock
