@@ -1,0 +1,8 @@
+# Stable
+max_width = 120
+use_field_init_shorthand = true
+newline_style = "Unix"
+edition = "2021"
+reorder_imports = true
+use_try_shorthand = true
+fn_call_width = 90
