@@ -1,1 +1,1 @@
-pub mod service;
+pub mod transcribe_service;

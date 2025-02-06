@@ -1,3 +1,3 @@
-pub mod simple_pb {
-    include!("_.rs");
+pub mod inference_pb {
+    include!("transcribe.rs");
 }

@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package transcribe;
+
+service TranscribeService {
+  rpc Transcribe (Audio) returns (Phrases) {}
+}
+
+message Phrases {
+  repeated Phrase phrases = 1;
+}
+
+message Phrase {
+  string text = 1;
+  repeated Word words = 2;
+}
+
+message Word {
+  string word = 1;
+  int64 start_ms = 2;
+  int64 end_ms = 3;
+}
+
+message Audio {
+  bytes audio_data = 1;
+}
