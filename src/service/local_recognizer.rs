@@ -1,5 +1,6 @@
-use crate::pb::inference_pb::{Phrase, Phrases, Word};
+use crate::pb::inference_pb::{Phrase, RecognizeResponse, Word};
 use serde_json::Value;
+use tonic::Status;
 use vosk::{Model, Recognizer};
 
 pub struct LocalRecogniser {
@@ -8,8 +9,8 @@ pub struct LocalRecogniser {
 
 impl LocalRecogniser {
     pub fn new(model_path: &str, sample_rate: f32) -> Self {
-        let model = Model::new(model_path).unwrap();
-        let mut recognizer = Recognizer::new(&model, sample_rate).unwrap();
+        let model = Model::new(model_path).expect("Could not initialize Vosk model!");
+        let mut recognizer = Recognizer::new(&model, sample_rate).expect("Failed to create recognizer");
 
         recognizer.set_words(true);
         recognizer.set_partial_words(true);
@@ -17,22 +18,28 @@ impl LocalRecogniser {
         Self { recognizer }
     }
 
-    pub fn transcribe(&mut self, audio: Vec<i16>) -> Phrases {
+    pub fn transcribe(&mut self, audio: Vec<i16>) -> Result<RecognizeResponse, Status> {
         for sample in audio.chunks(100) {
-            self.recognizer.accept_waveform(sample).expect("Processing error");
+            self.recognizer
+                .accept_waveform(sample)
+                .map_err(|err| Status::internal(format!("Recognize error: {err}")))?;
             println!("{:#?}", self.recognizer.partial_result());
         }
 
         let result = self.recognizer.final_result();
 
-        let mut phrases = Phrases::default();
+        let result_str = serde_json::to_string(&result)
+            .map_err(|err| Status::internal(format!("Failed to serialize CompleteResult: {err}")))?;
+        let json_result: Value = serde_json::from_str(&result_str)
+            .map_err(|err| Status::internal(format!("Failed to parse result JSON: {err}")))?;
 
-        let result_str = serde_json::to_string(&result).expect("Failed to serialize CompleteResult");
-        let json_result: Value = serde_json::from_str(&result_str).expect("Failed to parse result JSON");
+        let mut recognize_response = RecognizeResponse::default();
 
         if let Some(text) = json_result["text"].as_str() {
-            let mut phrase = Phrase::default();
-            phrase.text = text.to_string();
+            let mut phrase = Phrase {
+                text: text.to_string(),
+                words: vec![],
+            };
 
             if let Some(words) = json_result["result"].as_array() {
                 for word_obj in words {
@@ -49,9 +56,9 @@ impl LocalRecogniser {
                 }
             }
 
-            phrases.phrases.push(phrase);
+            recognize_response.phrases.push(phrase);
         }
 
-        phrases
+        Ok(recognize_response)
     }
 }

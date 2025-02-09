@@ -31,6 +31,6 @@ impl Settings {
     }
 
     pub fn json_pretty(&self) -> String {
-        to_string_pretty(&self).unwrap()
+        to_string_pretty(&self).expect("Failed serialize")
     }
 }

@@ -3,10 +3,10 @@ syntax = "proto3";
 package transcribe;
 
 service TranscribeService {
-  rpc Transcribe (Audio) returns (Phrases) {}
+  rpc Transcribe (RecognizeRequest) returns (RecognizeResponse) {}
 }
 
-message Phrases {
+message RecognizeResponse {
   repeated Phrase phrases = 1;
 }
 
@@ -21,6 +21,19 @@ message Word {
   int64 end_ms = 3;
 }
 
-message Audio {
-  bytes audio_data = 1;
+message RecognizeRequest {
+  AudioConfig config = 1;
+  bytes content = 2;
+}
+
+message AudioConfig {
+  uint32 sample_rate = 1;
+  AudioType audio_type = 2;
+}
+
+enum AudioType {
+  UNSPECIFIED = 0;
+  WAV_PCM_S16LE = 1;
+  RAW_PCM_S16LE = 2;
+  RAW_PCM_S16BE = 3;
 }

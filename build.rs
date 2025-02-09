@@ -9,7 +9,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_client(false)
         .build_server(true)
         .compile_protos(&[proto_file], &["proto"])
-        .unwrap_or_else(|e| panic!("Failed to compile protos {:?}", e));
+        .unwrap_or_else(|e| panic!("Failed to compile protos {e}"));
 
     Ok(())
 }

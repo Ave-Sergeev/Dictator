@@ -1,29 +1,52 @@
+use crate::error::error::TranscribeServiceError;
 use crate::pb::inference_pb::transcribe_service_server::TranscribeService;
-use crate::pb::inference_pb::*;
+use crate::pb::inference_pb::{AudioConfig, AudioType, RecognizeRequest, RecognizeResponse};
 use crate::service::local_recognizer::LocalRecogniser;
+use crate::utils::transcode::pcm_s16be_to_pcm_s16le;
+use crate::utils::wav::{bytes_to_i16, get_samples_from_wav};
 use tonic::{Request, Response, Status};
 
 #[derive(Debug, Default)]
-pub struct Service {}
+pub struct ServiceImpl {}
+
+impl ServiceImpl {
+    fn get_audio_and_config_from_request(request: &RecognizeRequest) -> Result<(Vec<i16>, AudioConfig), Status> {
+        let config = request
+            .config
+            .ok_or_else(|| Status::invalid_argument("No config provided"))?;
+
+        let audio = Self::transform_audio_to_i16(&request.content, config)?;
+
+        Ok((audio, config))
+    }
+
+    fn transform_audio_to_i16(audio: &[u8], config: AudioConfig) -> Result<Vec<i16>, Status> {
+        match config.audio_type() {
+            AudioType::WavPcmS16le => get_samples_from_wav(audio),
+            AudioType::RawPcmS16le => Ok(bytes_to_i16(audio)),
+            AudioType::RawPcmS16be => {
+                let bytes = pcm_s16be_to_pcm_s16le(audio);
+                Ok(bytes_to_i16(&bytes))
+            }
+            AudioType::Unspecified => Err(TranscribeServiceError::InvalidAudio(
+                "Only pcm_s16le and pcm_s16be are supported".to_string(),
+            )),
+        }
+        .map_err(|err| Status::invalid_argument(format!("{err}")))
+    }
+}
 
 #[tonic::async_trait]
-impl TranscribeService for Service {
-    async fn transcribe(&self, request: Request<Audio>) -> Result<Response<Phrases>, Status> {
-        let audio_data = request.into_inner().audio_data;
-        let samples: Vec<i16> = audio_data
-            .chunks_exact(2)
-            .map(|chunk| {
-                let buf = &chunk[..];
-                i16::from_le_bytes([buf[0], buf[1]])
-            })
-            .collect();
+impl TranscribeService for ServiceImpl {
+    async fn transcribe(&self, request: Request<RecognizeRequest>) -> Result<Response<RecognizeResponse>, Status> {
+        let recognize_request = request.into_inner();
+        let (audio_data, config) = Self::get_audio_and_config_from_request(&recognize_request)?;
+        let sample_rate = config.sample_rate as f32;
+        let model_path = "./model/small-ru";
 
-        let model_path = String::from("./resources/vosk-model-small-ru-0.22");
-        let sample_rate = 16000.0;
+        let mut local_recognizer = LocalRecogniser::new(&model_path, sample_rate);
+        let response = local_recognizer.transcribe(audio_data)?;
 
-        let mut recognizer = LocalRecogniser::new(&*model_path, sample_rate);
-        let result = recognizer.transcribe(samples);
-
-        Ok(Response::new(result))
+        Ok(Response::new(response))
     }
 }
