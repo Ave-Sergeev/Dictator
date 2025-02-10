@@ -11,5 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .compile_protos(&[proto_file], &["proto"])
         .unwrap_or_else(|e| panic!("Failed to compile protos {e}"));
 
+    let lib_path = "./model/vosk";
+    println!("cargo:rustc-link-search={}", lib_path);
+
     Ok(())
 }

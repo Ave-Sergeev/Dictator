@@ -9,6 +9,8 @@ pub struct LocalRecogniser {
 
 impl LocalRecogniser {
     pub fn new(model_path: &str, sample_rate: f32) -> Self {
+        vosk::gpu_init();
+
         let model = Model::new(model_path).expect("Could not initialize Vosk model!");
         let mut recognizer = Recognizer::new(&model, sample_rate).expect("Failed to create recognizer");
 
