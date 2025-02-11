@@ -5,11 +5,17 @@ use crate::service::local_recognizer::LocalRecogniser;
 use crate::utils::transcode::pcm_s16be_to_pcm_s16le;
 use crate::utils::wav::{bytes_to_i16, get_samples_from_wav};
 use tonic::{Request, Response, Status};
+use vosk::Model;
 
-#[derive(Debug, Default)]
-pub struct ServiceImpl {}
+pub struct ServiceImpl {
+    pub model: Model,
+}
 
 impl ServiceImpl {
+    pub fn new(model: Model) -> ServiceImpl {
+        Self { model }
+    }
+
     fn get_audio_and_config_from_request(request: &RecognizeRequest) -> Result<(Vec<i16>, AudioConfig), Status> {
         let config = request
             .config
@@ -21,6 +27,10 @@ impl ServiceImpl {
     }
 
     fn transform_audio_to_i16(audio: &[u8], config: AudioConfig) -> Result<Vec<i16>, Status> {
+        if audio.is_empty() {
+            return Err(Status::invalid_argument("Audio input is empty"));
+        }
+
         match config.audio_type() {
             AudioType::WavPcmS16le => get_samples_from_wav(audio),
             AudioType::RawPcmS16le => Ok(bytes_to_i16(audio)),
@@ -42,9 +52,9 @@ impl TranscribeService for ServiceImpl {
         let recognize_request = request.into_inner();
         let (audio_data, config) = Self::get_audio_and_config_from_request(&recognize_request)?;
         let sample_rate = config.sample_rate as f32;
-        let model_path = "./model/small-ru";
+        let model = &self.model;
 
-        let mut local_recognizer = LocalRecogniser::new(&model_path, sample_rate);
+        let mut local_recognizer = LocalRecogniser::new(&model, sample_rate);
         let response = local_recognizer.transcribe(audio_data)?;
 
         Ok(Response::new(response))

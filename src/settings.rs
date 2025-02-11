@@ -11,8 +11,14 @@ pub struct Server {
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
+pub struct Vosk {
+    pub model_path: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Settings {
     pub server: Server,
+    pub vosk: Vosk,
 }
 
 impl Settings {

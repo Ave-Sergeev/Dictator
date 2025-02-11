@@ -2,6 +2,7 @@ use crate::pb::inference_pb::transcribe_service_server::TranscribeServiceServer;
 use crate::service::transcribe_service::ServiceImpl;
 use crate::settings::Settings;
 use tonic::transport::Server;
+use vosk::Model;
 
 mod error;
 mod pb;
@@ -17,7 +18,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let address = format!("{}:{}", settings.server.host, settings.server.port).parse()?;
     println!("Server listening on {}", address);
 
-    let transcribe_service = ServiceImpl::default();
+    let model = Model::new(settings.vosk.model_path).expect("Could not initialize Vosk model!");
+    let transcribe_service = ServiceImpl::new(model);
 
     Server::builder()
         .add_service(TranscribeServiceServer::new(transcribe_service))
