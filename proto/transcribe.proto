@@ -23,12 +23,13 @@ message Word {
 
 message RecognizeRequest {
   AudioConfig config = 1;
-  bytes content = 2;
+  bytes content = 3;                    // Аудио в виде массива байт
 }
 
 message AudioConfig {
-  uint32 sample_rate = 1;
-  AudioType audio_type = 2;
+  uint32 sample_rate = 1;               // Частота дискретизации (Гц)
+  uint32 max_alternatives = 2;          // Максимальное количество альтернатив
+  AudioType audio_type = 3;             // Формат аудиофайла
 }
 
 enum AudioType {

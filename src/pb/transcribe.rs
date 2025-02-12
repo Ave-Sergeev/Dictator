@@ -24,14 +24,20 @@ pub struct Word {
 pub struct RecognizeRequest {
     #[prost(message, optional, tag = "1")]
     pub config: ::core::option::Option<AudioConfig>,
-    #[prost(bytes = "vec", tag = "2")]
+    /// Аудио в виде массива байт
+    #[prost(bytes = "vec", tag = "3")]
     pub content: ::prost::alloc::vec::Vec<u8>,
 }
 #[derive(Clone, Copy, PartialEq, ::prost::Message)]
 pub struct AudioConfig {
+    /// Частота дискретизации (Гц)
     #[prost(uint32, tag = "1")]
     pub sample_rate: u32,
-    #[prost(enumeration = "AudioType", tag = "2")]
+    /// Максимальное количество альтернатив
+    #[prost(uint32, tag = "2")]
+    pub max_alternatives: u32,
+    /// Формат аудиофайла
+    #[prost(enumeration = "AudioType", tag = "3")]
     pub audio_type: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

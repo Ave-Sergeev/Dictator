@@ -52,9 +52,10 @@ impl TranscribeService for ServiceImpl {
         let recognize_request = request.into_inner();
         let (audio_data, config) = Self::get_audio_and_config_from_request(&recognize_request)?;
         let sample_rate = config.sample_rate as f32;
+        let max_alternatives = config.max_alternatives as u16;
         let model = &self.model;
 
-        let mut local_recognizer = LocalRecogniser::new(&model, sample_rate);
+        let mut local_recognizer = LocalRecogniser::new(&model, sample_rate, max_alternatives)?;
         let response = local_recognizer.transcribe(audio_data)?;
 
         Ok(Response::new(response))
