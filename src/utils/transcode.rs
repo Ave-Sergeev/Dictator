@@ -1,10 +1,10 @@
 pub fn pcm_s16be_to_pcm_s16le(input: &[u8]) -> Vec<u8> {
-    let mut output = Vec::new();
-    for i in 0..input.len() {
-        if i % 2 == 0 {
-            output.push(input[i + 1]);
-            output.push(input[i]);
-        }
+    if input.len() % 2 != 0 {
+        eprintln!("Warning: Input length is odd. The last byte will be ignored");
     }
-    output
+
+    input
+        .chunks_exact(2)
+        .flat_map(|chunk| [chunk[1], chunk[0]].into_iter())
+        .collect()
 }

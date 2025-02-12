@@ -13,6 +13,7 @@ pub struct Server {
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Vosk {
     pub model_path: String,
+    pub pause_threshold: i64,
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]

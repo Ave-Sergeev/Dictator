@@ -5,3 +5,5 @@ server:
 # Model
 vosk:
   model_path: "./model/small-ru"
+  pause_threshold: 500
+  

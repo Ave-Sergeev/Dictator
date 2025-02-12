@@ -7,12 +7,13 @@ service TranscribeService {
 }
 
 message RecognizeResponse {
-  repeated Phrase phrases = 1;
+  repeated Phrase phrases = 1;          // Отдельные фразы в тексте
+  string text = 2;                      // Весь распознанный текст
 }
 
 message Phrase {
-  string text = 1;
-  repeated Word words = 2;
+  string text = 1;                      // Фраза целиком
+  repeated Word words = 2;              // Список отдельных слов внутри фразы
 }
 
 message Word {
@@ -29,7 +30,8 @@ message RecognizeRequest {
 message AudioConfig {
   uint32 sample_rate = 1;               // Частота дискретизации (Гц)
   uint32 max_alternatives = 2;          // Максимальное количество альтернатив
-  AudioType audio_type = 3;             // Формат аудиофайла
+  bool split_into_phrases = 3;          // Включение/отключение разбивки на фразы
+  AudioType audio_type = 4;             // Формат аудиофайла
 }
 
 enum AudioType {

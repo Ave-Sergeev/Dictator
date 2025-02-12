@@ -9,11 +9,12 @@ use vosk::Model;
 
 pub struct ServiceImpl {
     pub model: Model,
+    pub pause_threshold: i64,
 }
 
 impl ServiceImpl {
-    pub fn new(model: Model) -> ServiceImpl {
-        Self { model }
+    pub fn new(model: Model, pause_threshold: i64) -> ServiceImpl {
+        Self { model, pause_threshold }
     }
 
     fn get_audio_and_config_from_request(request: &RecognizeRequest) -> Result<(Vec<i16>, AudioConfig), Status> {
@@ -53,9 +54,12 @@ impl TranscribeService for ServiceImpl {
         let (audio_data, config) = Self::get_audio_and_config_from_request(&recognize_request)?;
         let sample_rate = config.sample_rate as f32;
         let max_alternatives = config.max_alternatives as u16;
+        let pause_threshold = &self.pause_threshold;
+        let split_into_phrases = config.split_into_phrases;
         let model = &self.model;
 
-        let mut local_recognizer = LocalRecogniser::new(&model, sample_rate, max_alternatives)?;
+        let mut local_recognizer =
+            LocalRecogniser::new(&model, sample_rate, max_alternatives, pause_threshold, split_into_phrases)?;
         let response = local_recognizer.transcribe(audio_data)?;
 
         Ok(Response::new(response))

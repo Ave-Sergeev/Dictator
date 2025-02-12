@@ -11,8 +11,7 @@ pub fn bytes_to_i16(bytes: &[u8]) -> Vec<i16> {
     bytes
         .chunks_exact(2)
         .map(|chunk| {
-            let mut bytes = [0; 2];
-            bytes.copy_from_slice(chunk);
+            let bytes = <[u8; 2]>::try_from(chunk).unwrap();
             i16::from_ne_bytes(bytes)
         })
         .collect()
