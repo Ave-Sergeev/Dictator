@@ -19,15 +19,19 @@ pub struct Phrase {
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Word {
+    /// Отдельное слово внутри фразы
     #[prost(string, tag = "1")]
     pub word: ::prost::alloc::string::String,
+    /// Временная метка начала слова (в ms)
     #[prost(int64, tag = "2")]
     pub start_ms: i64,
+    /// Временная метка конца слова (в ms)
     #[prost(int64, tag = "3")]
     pub end_ms: i64,
 }
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RecognizeRequest {
+    /// Конфигурация для распознавания
     #[prost(message, optional, tag = "1")]
     pub config: ::core::option::Option<AudioConfig>,
     /// Аудио в виде массива байт
@@ -42,7 +46,7 @@ pub struct AudioConfig {
     /// Максимальное количество альтернатив
     #[prost(uint32, tag = "2")]
     pub max_alternatives: u32,
-    /// Включить разбиение на фразы
+    /// Включить (отключить) разбивку на фразы
     #[prost(bool, tag = "3")]
     pub split_into_phrases: bool,
     /// Формат аудиофайла
@@ -52,9 +56,13 @@ pub struct AudioConfig {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum AudioType {
+    /// Формат аудио не определен
     Unspecified = 0,
+    /// Формат аудио — WAV с 16-битным PCM и little-endian байтовым порядком
     WavPcmS16le = 1,
+    /// Формат аудио — RAW с 16-битным PCM и little-endian байтовым порядком
     RawPcmS16le = 2,
+    /// Формат аудио — RAW с 16-битным PCM и big-endian байтовым порядком
     RawPcmS16be = 3,
 }
 impl AudioType {
