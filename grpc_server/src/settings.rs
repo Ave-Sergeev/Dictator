@@ -16,10 +16,39 @@ pub struct Vosk {
     pub pause_threshold: i64,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+#[serde(default)]
+pub struct VadSettings {
+    pub model_path: String,
+    pub sessions_num: u8,
+    pub frame_size: usize,
+    pub threshold: f32,
+    pub min_silence_duration_ms: usize,
+    pub speech_pad_ms: usize,
+    pub min_speech_duration_ms: usize,
+    pub max_speech_duration_s: f32,
+}
+
+impl Default for VadSettings {
+    fn default() -> Self {
+        Self {
+            model_path: "./model/silero/silero_vad.onnx".to_string(),
+            sessions_num: 1,
+            frame_size: 64,
+            threshold: 0.5,
+            min_silence_duration_ms: 0,
+            speech_pad_ms: 64,
+            min_speech_duration_ms: 64,
+            max_speech_duration_s: f32::INFINITY,
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Settings {
     pub server: Server,
     pub vosk: Vosk,
+    pub vad: VadSettings,
 }
 
 impl Settings {

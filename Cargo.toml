@@ -1,25 +1,33 @@
-[package]
+[workspace.package]
 name = "dictator"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Artem Sergeev <...>"]
 edition = "2021"
+publish = false
 
-[dependencies]
+[workspace]
+resolver = "2"
+members = [
+    "grpc_server",
+    "silero_vad",
+]
+
+[workspace.dependencies]
+silero_vad = { path = "silero_vad" }
 log = "0.4.25"
 hound = "3.5.1"
 tonic = "0.12.3"
 prost = "0.13.4"
 config = "0.15.7"
 anyhow = "1.0.95"
+ndarray = "0.16"
+lazy_static = "1.5"
 thiserror = "2.0.11"
 serde_json = "1.0.138"
+lockfree-object-pool = "0.1"
+tonic-build = { version = "0.12", features = [] }
 vosk = { version = "0.3.1", features = ["batch"] }
 serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1.37.0", features = ["macros", "rt-multi-thread"] }
-
-[build-dependencies]
-tonic-build = { version = "0.12", features = [] }
-
-[[bin]]
-name = "grpc_server"
-path = "src/server.rs"
+ort = { version = "=2.0.0-rc.9", features = ["load-dynamic", "coreml", "ndarray", "directml", "cuda"] }
+parking_lot = { version = "0.12", features = ["hardware-lock-elision", "serde", "deadlock_detection", "arc_lock"] }

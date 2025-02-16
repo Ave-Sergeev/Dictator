@@ -18,8 +18,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let address = format!("{}:{}", settings.server.host, settings.server.port).parse()?;
     println!("Server listening on {}", address);
 
-    let model = Model::new(settings.vosk.model_path).expect("Could not initialize Vosk model!");
-    let transcribe_service = ServiceImpl::new(model, settings.vosk.pause_threshold);
+    let model_path = settings.vosk.model_path.clone();
+    let model = Model::new(model_path).expect("Could not initialize Vosk model!");
+
+    let transcribe_service = ServiceImpl::new(model, &settings)?;
 
     Server::builder()
         .add_service(TranscribeServiceServer::new(transcribe_service))

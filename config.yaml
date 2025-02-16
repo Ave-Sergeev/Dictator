@@ -2,8 +2,10 @@
 server:
   host: 127.0.0.1
   port: 3000
-# Model
+# Models
 vosk:
   model_path: "./model/small-ru"
   pause_threshold: 500
-  
+vad:
+  model_path: "./model/silero/silero_vad.onnx"
+  sessions_num: 5

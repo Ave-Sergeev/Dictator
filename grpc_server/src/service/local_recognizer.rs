@@ -1,4 +1,4 @@
-use crate::pb::inference_pb::{Phrase, RecognizeResponse, Word};
+use crate::pb::inference_pb::{Phrase, TranscribeResponse, Word};
 use crate::utils::word::{convert_word, UniversalWord};
 use tonic::Status;
 use vosk::{CompleteResult, Model, Recognizer};
@@ -33,7 +33,7 @@ impl LocalRecogniser {
         })
     }
 
-    pub fn transcribe(&mut self, audio: Vec<i16>) -> Result<RecognizeResponse, Status> {
+    pub fn transcribe(&mut self, audio: Vec<i16>) -> Result<TranscribeResponse, Status> {
         self.recognizer
             .accept_waveform(&audio)
             .map_err(|err| Status::internal(format!("Recognize error: {err}")))?;
@@ -44,7 +44,7 @@ impl LocalRecogniser {
         Ok(recognize_response)
     }
 
-    fn process(complete_result: CompleteResult, pause_threshold: i64, split_into_phrases: bool) -> RecognizeResponse {
+    fn process(complete_result: CompleteResult, pause_threshold: i64, split_into_phrases: bool) -> TranscribeResponse {
         match complete_result {
             CompleteResult::Single(result) => {
                 Self::create_response(result.text, result.result, pause_threshold, split_into_phrases)
@@ -58,7 +58,7 @@ impl LocalRecogniser {
                         split_into_phrases,
                     )
                 } else {
-                    RecognizeResponse::default()
+                    TranscribeResponse::default()
                 }
             }
         }
@@ -69,9 +69,9 @@ impl LocalRecogniser {
         words: impl IntoIterator<Item = impl UniversalWord>,
         pause_threshold: i64,
         split_into_phrases: bool,
-    ) -> RecognizeResponse {
+    ) -> TranscribeResponse {
         if text.is_empty() {
-            return RecognizeResponse::default();
+            return TranscribeResponse::default();
         }
 
         let pb_words = words.into_iter().map(|word| convert_word(&word)).collect();
@@ -83,7 +83,7 @@ impl LocalRecogniser {
             }],
         };
 
-        RecognizeResponse {
+        TranscribeResponse {
             phrases,
             text: text.to_string(),
         }

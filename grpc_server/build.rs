@@ -1,6 +1,6 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let proto_gen_dir = "./src/pb";
-    let proto_file = "proto/transcribe.proto";
+    let proto_file = "./proto/transcribe.proto";
     let arg = "--experimental_allow_proto3_optional";
 
     tonic_build::configure()

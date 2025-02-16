@@ -1,0 +1,14 @@
+[package]
+name = "silero_vad"
+version.workspace = true
+edition.workspace = true
+authors = ["Victor Nguen <...>", "Artem Sergeev <...>"]
+description = "VAD tools"
+
+[dependencies]
+ort.workspace = true
+ndarray.workspace = true
+lazy_static.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+lockfree-object-pool.workspace = true
