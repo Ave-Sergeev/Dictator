@@ -29,7 +29,7 @@ impl From<usize> for SampleRate {
         match value {
             8000 => SampleRate::EightKHz,
             16000 => SampleRate::SixteenKHz,
-            _ => panic!("Unsupported sample rate: {}", value),
+            _ => panic!("Unsupported sample rate: {value}"),
         }
     }
 }

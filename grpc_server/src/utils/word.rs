@@ -17,11 +17,13 @@ pub trait UniversalWord {
 
 impl UniversalWord for VoskWord<'_> {
     fn word(&self) -> &str {
-        &self.word
+        self.word
     }
+
     fn start(&self) -> f32 {
         self.start
     }
+
     fn end(&self) -> f32 {
         self.end
     }
@@ -29,11 +31,13 @@ impl UniversalWord for VoskWord<'_> {
 
 impl UniversalWord for WordInAlternative<'_> {
     fn word(&self) -> &str {
-        &self.word
+        self.word
     }
+
     fn start(&self) -> f32 {
         self.start
     }
+
     fn end(&self) -> f32 {
         self.end
     }

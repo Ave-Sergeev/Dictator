@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Settings:\n{}", settings.json_pretty());
 
     let address = format!("{}:{}", settings.server.host, settings.server.port).parse()?;
-    println!("Server listening on {}", address);
+    println!("Server listening on {address}");
 
     let model_path = settings.vosk.model_path.clone();
     let model = Model::new(model_path).expect("Could not initialize Vosk model!");

@@ -30,7 +30,7 @@ impl VadService {
 
     pub fn recognize(&self, audio: Vec<i16>, sample_rate: u32) -> error::Result<Vec<TimeStamp>> {
         match sample_rate {
-            16000 => Ok(self.recognizer.process(&*audio)?),
+            16000 => Ok(self.recognizer.process(&audio)?),
             _ => Err(error::ServiceError::InvalidAudio("Unsupported sample rate".to_string())),
         }
     }

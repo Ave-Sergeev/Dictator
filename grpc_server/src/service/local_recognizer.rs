@@ -74,7 +74,7 @@ impl LocalRecogniser {
             return TranscribeResponse::default();
         }
 
-        let pb_words = words.into_iter().map(|word| convert_word(&word)).collect();
+        let pb_words = words.into_iter().map(|word| convert_word(&word)).collect::<Vec<_>>();
         let phrases = match split_into_phrases {
             true => Self::group_phrases(pb_words, pause_threshold),
             false => vec![Phrase {

@@ -71,7 +71,7 @@ impl TranscribeService for ServiceImpl {
             .vad_service
             .recognize(audio_data.clone(), config.sample_rate)
             .map_err(|e| Status::internal(e.to_string()))?;
-        let intervals = result.iter().map(timestamp_to_speech_interval).collect();
+        let intervals = result.iter().map(timestamp_to_speech_interval).collect::<Vec<_>>();
 
         let response = VadResponse { intervals };
 

@@ -33,9 +33,10 @@ impl SileroSession {
             .collect::<Vec<_>>();
         let mut frame = Array2::<f32>::from_shape_vec([1, data.len()], data).unwrap();
         frame = frame.slice(s![.., ..480]).to_owned();
-        let inps = ort::inputs![frame, std::mem::take(&mut self.state), self.sample_rate.clone(),]?;
+        let inps = ort::inputs![frame, std::mem::take(&mut self.state), self.sample_rate.clone()]?;
         let res = self.session.run(ort::session::SessionInputs::ValueSlice::<3>(&inps))?;
-        self.state = res["stateN"].try_extract_tensor().unwrap().to_owned();
+        self.state = res["stateN"].try_extract_tensor()?.to_owned();
+
         Ok(*res["output"].try_extract_raw_tensor::<f32>()?.1.first().unwrap())
     }
 

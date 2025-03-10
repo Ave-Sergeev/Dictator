@@ -60,12 +60,14 @@ impl Recognizer {
             .with_inter_threads(1)?
             .with_optimization_level(GraphOptimizationLevel::Level3)?
             .commit_from_file(model_path)?;
+
         Ok(session)
     }
 
     pub fn process(&self, samples: &[i16]) -> Result<Vec<TimeStamp>, ServiceError> {
         let mut vad = self.vad_iter_pool.pull();
         vad.process(samples)?;
+
         Ok(vad.speeches())
     }
 }

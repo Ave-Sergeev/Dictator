@@ -24,11 +24,14 @@ impl VadIter {
 
     pub fn process(&mut self, samples: &[i16]) -> Result<(), ort::Error> {
         self.reset_states();
+
         for audio_frame in samples.chunks_exact(self.params.frame_size_samples) {
             let speech_prob: f32 = self.silero.calc_level(audio_frame)?;
             self.state.update(&self.params, speech_prob);
         }
+
         self.state.check_for_last_speech(samples.len());
+
         Ok(())
     }
 
@@ -44,6 +47,7 @@ impl VadIter {
             acc
         })
     }
+
     fn reset_states(&mut self) {
         self.silero.reset();
         self.state = State::new(self.params.sample_rate)
@@ -86,6 +90,7 @@ impl From<VadParams> for Params {
             sample_rate as f32 * max_speech_duration_s - frame_size_samples as f32 - 2.0 * speech_pad_samples as f32;
         let min_silence_samples = sr_per_ms * min_silence_duration_ms;
         let min_silence_samples_at_max_speech = sr_per_ms * 98;
+
         Self {
             frame_size,
             threshold,
