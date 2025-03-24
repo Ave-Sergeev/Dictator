@@ -1,13 +1,13 @@
 use crate::error::error;
-use crate::error::error::ServiceError;
 use crate::pb::inference_pb::transcribe_service_server::TranscribeService;
 use crate::pb::inference_pb::{AudioConfig, AudioType, RecognizeRequest, TranscribeResponse, VadResponse};
 use crate::service::local_recognizer::LocalRecogniser;
 use crate::service::vad_recognizer::VadService;
 use crate::settings::Settings;
 use crate::utils::grpc::timestamp_to_speech_interval;
+use crate::utils::raw::is_pcm_raw;
 use crate::utils::transcode::pcm_s16be_to_pcm_s16le;
-use crate::utils::wav::{bytes_to_i16, get_samples_from_wav};
+use crate::utils::wav::{bytes_to_i16, get_samples_from_wav, is_mono_pcm_wav};
 use std::sync::Arc;
 use tonic::{Request, Response, Status};
 use vosk::Model;
@@ -47,17 +47,46 @@ impl ServiceImpl {
         }
 
         match config.audio_type() {
-            AudioType::WavPcmS16le => get_samples_from_wav(audio),
-            AudioType::RawPcmS16le => Ok(bytes_to_i16(audio)),
+            AudioType::WavPcmS16le => {
+                let is_valid = is_mono_pcm_wav(audio, config.sample_rate)
+                    .map_err(|err| Status::invalid_argument(format!("{err}")))?;
+
+                if !is_valid {
+                    return Err(Status::invalid_argument(
+                        "Invalid WAV format: must be mono PCM with the correct sample rate".to_string(),
+                    ));
+                }
+
+                get_samples_from_wav(audio).map_err(|err| Status::invalid_argument(format!("{err}")))
+            }
+            AudioType::RawPcmS16le => {
+                let is_valid = is_pcm_raw(audio);
+
+                if !is_valid {
+                    return Err(Status::invalid_argument(
+                        "Invalid RAW PCM data: empty or odd number of bytes".to_string(),
+                    ));
+                }
+
+                Ok(bytes_to_i16(audio))
+            }
             AudioType::RawPcmS16be => {
+                let is_valid = is_pcm_raw(audio);
+
+                if !is_valid {
+                    return Err(Status::invalid_argument(
+                        "Invalid raw PCM data: empty or odd number of bytes".to_string(),
+                    ));
+                }
+
                 let bytes = pcm_s16be_to_pcm_s16le(audio);
+
                 Ok(bytes_to_i16(&bytes))
             }
             AudioType::Unspecified => {
-                Err(ServiceError::InvalidAudio("Only pcm_s16le and pcm_s16be are supported".to_string()))
+                Err(Status::invalid_argument("Only pcm_s16le and pcm_s16be are supported".to_string()))
             }
         }
-        .map_err(|err| Status::invalid_argument(format!("{err}")))
     }
 }
 
