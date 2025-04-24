@@ -1,5 +1,5 @@
+use anyhow::Result;
 use config::Config;
-use log::{log, Level};
 use serde::{Deserialize, Serialize};
 use serde_json::to_string_pretty;
 use std::path::Path;
@@ -11,7 +11,12 @@ pub struct Server {
 }
 
 #[derive(Debug, Deserialize, Serialize, Default)]
-pub struct Vosk {
+pub struct Logging {
+    pub log_level: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Default)]
+pub struct VoskSetting {
     pub model_path: String,
     pub pause_threshold: i64,
 }
@@ -47,18 +52,19 @@ impl Default for VadSettings {
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct Settings {
     pub server: Server,
-    pub vosk: Vosk,
     pub vad: VadSettings,
+    pub vosk: VoskSetting,
+    pub logging: Logging,
 }
 
 impl Settings {
-    pub fn new(location: &str) -> anyhow::Result<Self> {
+    pub fn new(location: &str) -> Result<Self> {
         let mut builder = Config::builder();
 
         if Path::new(location).exists() {
             builder = builder.add_source(config::File::with_name(location));
         } else {
-            log!(Level::Warn, "Configuration file not found");
+            log::warn!("Configuration file not found");
         }
 
         let settings = builder.build()?.try_deserialize()?;

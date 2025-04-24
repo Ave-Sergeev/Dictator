@@ -1,7 +1,7 @@
 use crate::service::silero::SileroSession;
 use crate::service::vad_iter::VadIter;
 use crate::utils::utils::{SampleRate, TimeStamp, VadParams};
-use crate::{error, OnnxSession};
+use crate::{OnnxSession, error};
 use error::error::ServiceError;
 use lockfree_object_pool::MutexObjectPool;
 use ort::session::builder::GraphOptimizationLevel;
@@ -23,9 +23,7 @@ impl Recognizer {
 
         let onnx_sessions = Self::create_onnx_sessions(model_path, sessions_num)?;
         let sessions_iter = Arc::new(Mutex::new(onnx_sessions.into_iter().cycle()));
-
         let sample_rate = vad_params.sample_rate.into();
-
         let vad_iter_pool = Self::create_vad_iter_pool(sessions_iter.clone(), sample_rate, vad_params);
 
         Ok(Self {
@@ -41,8 +39,9 @@ impl Recognizer {
     ) -> MutexObjectPool<VadIter> {
         MutexObjectPool::new(
             move || {
-                let session = sessions_iter.lock().next().expect("no onnx sessions to cycle");
-                let silero = SileroSession::new(session, sample_rate).expect("error creating Silero session");
+                let session = sessions_iter.lock().next().expect("No onnx sessions to cycle");
+                let silero = SileroSession::new(session, sample_rate).expect("Error creating Silero session");
+
                 VadIter::new(silero, vad_params.clone())
             },
             |_| {},
@@ -66,6 +65,7 @@ impl Recognizer {
 
     pub fn process(&self, samples: &[i16]) -> Result<Vec<TimeStamp>, ServiceError> {
         let mut vad = self.vad_iter_pool.pull();
+
         vad.process(samples)?;
 
         Ok(vad.speeches())

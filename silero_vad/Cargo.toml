@@ -1,14 +1,15 @@
 [package]
 name = "silero_vad"
 version.workspace = true
+authors.workspace = true
 edition.workspace = true
-authors = ["Victor Nguen <...>", "Artem Sergeev <...>"]
-description = "VAD tools"
+publish.workspace = true
 
 [dependencies]
 ort.workspace = true
+log.workspace = true
 ndarray.workspace = true
+thiserror.workspace = true
 lazy_static.workspace = true
 parking_lot.workspace = true
-thiserror.workspace = true
 lockfree-object-pool.workspace = true

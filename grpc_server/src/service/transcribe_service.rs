@@ -49,22 +49,22 @@ impl ServiceImpl {
         match config.audio_type() {
             AudioType::WavPcmS16le => {
                 let is_valid = is_mono_pcm_wav(audio, config.sample_rate)
-                    .map_err(|err| Status::invalid_argument(format!("{err}")))?;
+                    .map_err(|err| Status::invalid_argument(err.to_string()))?;
 
                 if !is_valid {
                     return Err(Status::invalid_argument(
-                        "Invalid WAV format: must be mono PCM with the correct sample rate".to_string(),
+                        "Invalid WAV format: must be mono PCM with the correct sample rate",
                     ));
                 }
 
-                get_samples_from_wav(audio).map_err(|err| Status::invalid_argument(format!("{err}")))
+                get_samples_from_wav(audio).map_err(|err| Status::invalid_argument(err.to_string()))
             }
             AudioType::RawPcmS16le => {
                 let is_valid = is_pcm_raw(audio);
 
                 if !is_valid {
                     return Err(Status::invalid_argument(
-                        "Invalid RAW PCM data: empty or odd number of bytes".to_string(),
+                        "Invalid RAW PCM data: empty or odd number of bytes",
                     ));
                 }
 
@@ -75,7 +75,7 @@ impl ServiceImpl {
 
                 if !is_valid {
                     return Err(Status::invalid_argument(
-                        "Invalid raw PCM data: empty or odd number of bytes".to_string(),
+                        "Invalid raw PCM data: empty or odd number of bytes",
                     ));
                 }
 
@@ -83,9 +83,7 @@ impl ServiceImpl {
 
                 Ok(bytes_to_i16(&bytes))
             }
-            AudioType::Unspecified => {
-                Err(Status::invalid_argument("Only pcm_s16le and pcm_s16be are supported".to_string()))
-            }
+            AudioType::Unspecified => Err(Status::invalid_argument("Only pcm_s16le and pcm_s16be are supported")),
         }
     }
 }
@@ -99,7 +97,7 @@ impl TranscribeService for ServiceImpl {
         let result = self
             .vad_service
             .recognize(audio_data.clone(), config.sample_rate)
-            .map_err(|e| Status::internal(e.to_string()))?;
+            .map_err(|err| Status::internal(err.to_string()))?;
         let intervals = result.iter().map(timestamp_to_speech_interval).collect::<Vec<_>>();
 
         let response = VadResponse { intervals };

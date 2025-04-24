@@ -1,5 +1,5 @@
 use crate::pb::inference_pb::{Phrase, TranscribeResponse, Word};
-use crate::utils::word::{convert_word, UniversalWord};
+use crate::utils::word::{UniversalWord, convert_word};
 use tonic::Status;
 use vosk::{CompleteResult, Model, Recognizer};
 
@@ -17,10 +17,8 @@ impl LocalRecogniser {
         pause_threshold: &i64,
         split_into_phrases: bool,
     ) -> Result<Self, Status> {
-        vosk::gpu_init();
-
         let mut recognizer = Recognizer::new(&model, sample_rate)
-            .ok_or_else(|| Status::internal("Failed to create recognizer".to_string()))?;
+            .ok_or_else(|| Status::internal("Failed to create recognizer"))?;
 
         recognizer.set_words(true);
         recognizer.set_partial_words(true);

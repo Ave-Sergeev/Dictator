@@ -2,15 +2,15 @@ use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, Copy)]
 pub enum SampleRate {
-    EightKHz,
-    SixteenKHz,
+    Rate8kHz,
+    Rate16kHz,
 }
 
 impl From<SampleRate> for i64 {
     fn from(value: SampleRate) -> Self {
         match value {
-            SampleRate::EightKHz => 8000,
-            SampleRate::SixteenKHz => 16000,
+            SampleRate::Rate8kHz => 8000,
+            SampleRate::Rate16kHz => 16000,
         }
     }
 }
@@ -18,8 +18,8 @@ impl From<SampleRate> for i64 {
 impl From<SampleRate> for usize {
     fn from(value: SampleRate) -> Self {
         match value {
-            SampleRate::EightKHz => 8000,
-            SampleRate::SixteenKHz => 16000,
+            SampleRate::Rate8kHz => 8000,
+            SampleRate::Rate16kHz => 16000,
         }
     }
 }
@@ -27,8 +27,8 @@ impl From<SampleRate> for usize {
 impl From<usize> for SampleRate {
     fn from(value: usize) -> Self {
         match value {
-            8000 => SampleRate::EightKHz,
-            16000 => SampleRate::SixteenKHz,
+            8000 => SampleRate::Rate8kHz,
+            16000 => SampleRate::Rate16kHz,
             _ => panic!("Unsupported sample rate: {value}"),
         }
     }
@@ -76,7 +76,7 @@ impl FrameStamp {
 
 impl Display for FrameStamp {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[start:{}, end:{}]", self.start, self.end)
+        write!(f, "[start: {}, end: {}]", self.start, self.end)
     }
 }
 

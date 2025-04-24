@@ -43,6 +43,7 @@ impl VadIter {
                     return acc;
                 }
             }
+
             acc.push(speech.clone());
             acc
         })
@@ -205,12 +206,15 @@ impl State {
     fn handle_speech_end(&mut self, params: &Params, speech_prob: f32) {
         #[cfg(debug_assertions)]
         self.debug(speech_prob, params, "end");
+
         if self.temp_end == 0 {
             self.temp_end = self.current_sample;
         }
+
         if self.current_sample.saturating_sub(self.temp_end) > params.min_silence_samples_at_max_speech {
             self.prev_end = self.temp_end;
         }
+
         if self.current_sample.saturating_sub(self.temp_end) >= params.min_silence_samples {
             self.current_speech.end = self.temp_end as _;
             if self.current_speech.end - self.current_speech.start > params.min_speech_samples as _ {
@@ -249,7 +253,7 @@ impl State {
             let speech = self.current_sample as f32
                 - params.frame_size_samples as f32
                 - if title == "end" { params.speech_pad_samples } else { 0 } as f32;
-            println!(
+            log::debug!(
                 "[{:10}: {:.3} s ({:.3}) {:8}]",
                 title,
                 speech / params.sample_rate as f32,

@@ -9,3 +9,6 @@ vosk:
 vad:
   model_path: "./model/silero/silero_vad.onnx"
   sessions_num: 5
+# Logging
+logging:
+  log_level: INFO

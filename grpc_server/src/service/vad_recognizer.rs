@@ -23,8 +23,8 @@ impl VadService {
         }
 
         let vad_params = vad_params(settings, 16000);
-
         let recognizer = Recognizer::new(settings.model_path.as_str(), vad_params, settings.sessions_num)?;
+
         Ok(Self { recognizer })
     }
 
