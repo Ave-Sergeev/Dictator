@@ -5,7 +5,7 @@ use hound::{SampleFormat, WavReader};
 pub fn get_samples_from_wav(wav: &[u8]) -> error::Result<Vec<i16>> {
     let mut reader = WavReader::new(wav)?;
 
-    let samples = reader.samples().filter_map(|sample| sample.ok()).collect::<Vec<_>>();
+    let samples = reader.samples().flatten().collect();
 
     Ok(samples)
 }

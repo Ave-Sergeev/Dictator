@@ -1,6 +1,6 @@
 /// Converts PCM audio data from 16-bit big-endian (S16BE) format to 16-bit little-endian (S16LE) format.
 pub fn pcm_s16be_to_pcm_s16le(input: &[u8]) -> Vec<u8> {
-    if input.len() % 2 != 0 {
+    if !input.len().is_multiple_of(2) {
         log::warn!("Warning: Input length is odd. The last byte will be ignored");
     }
 

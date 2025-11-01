@@ -17,8 +17,8 @@ impl LocalRecogniser {
         pause_threshold: &i64,
         split_into_phrases: bool,
     ) -> Result<Self, Status> {
-        let mut recognizer = Recognizer::new(&model, sample_rate)
-            .ok_or_else(|| Status::internal("Failed to create recognizer"))?;
+        let mut recognizer =
+            Recognizer::new(model, sample_rate).ok_or_else(|| Status::internal("Failed to create recognizer"))?;
 
         recognizer.set_words(true);
         recognizer.set_partial_words(true);
@@ -73,12 +73,13 @@ impl LocalRecogniser {
         }
 
         let pb_words = words.into_iter().map(|word| convert_word(&word)).collect::<Vec<_>>();
-        let phrases = match split_into_phrases {
-            true => Self::group_phrases(pb_words, pause_threshold),
-            false => vec![Phrase {
+        let phrases = if split_into_phrases {
+            Self::group_phrases(pb_words, pause_threshold)
+        } else {
+            vec![Phrase {
                 text: text.to_string(),
                 words: pb_words,
-            }],
+            }]
         };
 
         TranscribeResponse {

@@ -17,7 +17,7 @@ impl VadIter {
     pub fn new(silero: SileroSession, params: VadParams) -> Self {
         Self {
             silero,
-            state: State::new(params.sample_rate.clone()),
+            state: State::new(params.sample_rate),
             params: Params::from(params),
         }
     }
@@ -37,12 +37,11 @@ impl VadIter {
 
     pub fn speeches(&self) -> Vec<TimeStamp> {
         self.state.speeches.iter().fold(Vec::new(), |mut acc, speech| {
-            if let Some(last) = acc.last_mut() {
-                if last.end == speech.start {
+            if let Some(last) = acc.last_mut()
+                && last.end == speech.start {
                     last.end = speech.end;
                     return acc;
                 }
-            }
 
             acc.push(speech.clone());
             acc

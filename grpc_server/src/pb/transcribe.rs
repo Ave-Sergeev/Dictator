@@ -32,7 +32,7 @@ pub struct SpeechInterval {
     #[prost(double, tag = "2")]
     pub end_s: f64,
 }
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct Word {
     /// Отдельное слово внутри фразы
     #[prost(string, tag = "1")]
@@ -44,7 +44,7 @@ pub struct Word {
     #[prost(int64, tag = "3")]
     pub end_ms: i64,
 }
-#[derive(Clone, PartialEq, ::prost::Message)]
+#[derive(Clone, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct RecognizeRequest {
     /// Конфигурация для распознавания
     #[prost(message, optional, tag = "1")]
@@ -53,7 +53,7 @@ pub struct RecognizeRequest {
     #[prost(bytes = "vec", tag = "2")]
     pub content: ::prost::alloc::vec::Vec<u8>,
 }
-#[derive(Clone, Copy, PartialEq, ::prost::Message)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, ::prost::Message)]
 pub struct AudioConfig {
     /// Частота дискретизации (Гц)
     #[prost(uint32, tag = "1")]
@@ -235,7 +235,7 @@ pub mod transcribe_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = VadSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,
@@ -280,7 +280,7 @@ pub mod transcribe_service_server {
                     let inner = self.inner.clone();
                     let fut = async move {
                         let method = TranscribeSvc(inner);
-                        let codec = tonic::codec::ProstCodec::default();
+                        let codec = tonic_prost::ProstCodec::default();
                         let mut grpc = tonic::server::Grpc::new(codec)
                             .apply_compression_config(
                                 accept_compression_encodings,

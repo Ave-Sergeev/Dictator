@@ -1,7 +1,7 @@
 /// Checks if the raw data is PCM raw audio data.
 /// PCM raw data must be non-empty and of even length (16-bit samples).
 pub fn is_pcm_raw(raw_data: &[u8]) -> bool {
-    !raw_data.is_empty() && raw_data.len() % 2 == 0
+    !raw_data.is_empty() && raw_data.len().is_multiple_of(2)
 }
 
 #[cfg(test)]

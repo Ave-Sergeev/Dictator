@@ -3,7 +3,7 @@ fn main() {
     let proto_file = "./proto/transcribe.proto";
     let arg = "--experimental_allow_proto3_optional";
 
-    tonic_build::configure()
+    tonic_prost_build::configure()
         .protoc_arg(arg)
         .out_dir(proto_gen_dir)
         .build_client(false)

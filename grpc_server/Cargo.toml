@@ -19,9 +19,10 @@ thiserror.workspace = true
 serde_json.workspace = true
 silero_vad.workspace = true
 env_logger.workspace = true
+tonic-prost.workspace = true
 
 [build-dependencies]
-tonic-build.workspace = true
+tonic-prost-build.workspace = true
 
 [[bin]]
 name = "grpc_server"

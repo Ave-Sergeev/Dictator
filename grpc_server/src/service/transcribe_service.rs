@@ -115,7 +115,7 @@ impl TranscribeService for ServiceImpl {
         let model = &self.model;
 
         let mut local_recognizer =
-            LocalRecogniser::new(&model, sample_rate, max_alternatives, pause_threshold, split_into_phrases)?;
+            LocalRecogniser::new(model, sample_rate, max_alternatives, pause_threshold, split_into_phrases)?;
         let response = local_recognizer.transcribe(audio_data)?;
 
         Ok(Response::new(response))
